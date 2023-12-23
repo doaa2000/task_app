@@ -10,14 +10,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:fly_networking/AppException.dart';
 import 'package:dio/dio.dart';
+import 'package:task_app/features/login_screen/data/models/login_model/login_model/user.dart';
+import 'package:task_app/features/login_screen/presentiation/views/login_view.dart';
+import 'package:get/get.dart';
+part 'auth_state.dart';
 
-part 'login_state.dart';
-
-class LoginCubit extends Cubit<LoginState> {
-  LoginCubit() : super(LoginInitial());
+class authCubit extends Cubit<LoginState> {
+  authCubit() : super(LoginInitial());
   final ApiService _apiService = GetIt.I<ApiService>();
 
-  static LoginCubit get(BuildContext context) => BlocProvider.of(context);
+  static authCubit get(BuildContext context) => BlocProvider.of(context);
   Future<void> userLogin(
       {required String email, required String password}) async {
     emit(LoginLoading());
@@ -27,13 +29,12 @@ class LoginCubit extends Cubit<LoginState> {
         'password': password,
       });
 
-      LoginModel loginModel = LoginModel.fromJson(data['payload']['data'][0]);
-      print("ssssss${data['payload']['data'][0]['refresh_token']}");
+      User userModel = User.fromJson(data['payload']['data'][0]['user']);
 
       await _apiService.storage.write(
           key: 'refreshToken',
           value: data['payload']['data'][0]['refresh_token']);
-      emit(LoginSuccess(loginModel: loginModel));
+      emit(LoginSuccess(user: userModel));
     } catch (error) {
       if (error.toString() == 'No Internet') {
         emit(LoginFailure(errorMessage: 'No internet connection'));
@@ -70,5 +71,12 @@ class LoginCubit extends Cubit<LoginState> {
       return true;
     }
     return false;
+  }
+
+  Future<void> userLogout() async {
+    await _apiService.storage.deleteAll().then((value) {
+      emit(LogoutSuccess());
+      Get.offAll(() => const LoginView());
+    });
   }
 }
