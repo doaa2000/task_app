@@ -52,6 +52,11 @@ class _ProfileViewState extends State<ProfileView> {
                 if (state is RefreshTokenExpired) {
                   Get.to(() => const LoginView());
                 }
+                if (state is LogoutSuccess) {
+                  showToastMessage(
+                      message: 'You are logged out successfully',
+                      isError: false);
+                }
               },
               builder: (context, state) {
                 if (state is LoginSuccess) {

@@ -137,8 +137,8 @@ class LoginView extends StatelessWidget {
                                 onTap: () {
                                   if (formKey.currentState!.validate()) {
                                     authCubit.get(context).userLogin(
-                                        email: 'alsaedifahad58@gmail.com',
-                                        password: 'Fa123456');
+                                        email: emailController.text,
+                                        password: passwordController.text);
                                   }
                                 },
                               ),
