@@ -2,14 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-class MyColors {
+class AppColors {
   static Color hoverColor = Colors.green;
-  static Color color1 = Color(0xffA7727D);
+  static Color primaryColor = const Color(0xffA7727D);
   static Color categoriesTextColor = Colors.white;
   static Color buttonColor = Colors.yellow;
-  static Color color2 = Color(0xffEDDBC7);
+  static Color color2 = const Color(0xffEDDBC7);
 
-  static Color color3 = Color(0xffEDDBC7);
+  static Color color3 = const Color(0xffEDDBC7);
 
   static Color customNavBarColor = Colors.white;
 

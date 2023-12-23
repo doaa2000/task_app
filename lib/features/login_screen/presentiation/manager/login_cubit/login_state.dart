@@ -18,3 +18,5 @@ final class LoginFailure extends LoginState {
 
   LoginFailure({required this.errorMessage});
 }
+
+final class RefreshTokenExpired extends LoginState {}

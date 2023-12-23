@@ -1,20 +1,35 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class ApiService {
-  final Dio _dio;
-  final baseUrl = 'https://uat-api.alfa-sa.co/api/auth/';
+  final Dio _dio = Dio();
+  static String baseUrl = 'https://uat-api.alfa-sa.co/api/auth/';
+  var storage = const FlutterSecureStorage();
+  static var headers = {
+    'x-api-version': 'v1',
+    'Content-Type': 'application/json'
+  };
 
-  ApiService(this._dio);
+  Future<Map<String, dynamic>> post(
+      {required String endPoint, data, String? authorization}) async {
+    bool hasInternet = await InternetConnectionChecker().hasConnection;
+    if (hasInternet) {
+      var response = await _dio.post('$baseUrl$endPoint',
+          data: data,
+          options: Options(
+            headers: {...headers, "Authorization": authorization},
+          ));
 
-  var headers = {'x-api-version': 'v1', 'Content-Type': 'application/json'};
+      Map<String, dynamic> responseData = {
+        'payload': response.data,
+        'status': response.statusCode
+      };
 
-  Future<Map<String, dynamic>> post({required String endPoint, data}) async {
-    final Response<dynamic> response = await _dio.post('$baseUrl$endPoint',
-        data: data,
-        options: Options(
-          headers: headers,
-        ));
-    print("api respons :  $response");
-    return response.data;
+      return responseData;
+    }
+    throw ('No Internet');
   }
 }
