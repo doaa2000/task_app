@@ -5,6 +5,7 @@ import 'package:task_app/features/login_screen/presentiation/views/login_view.da
 import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_app/features/login_screen/presentiation/manager/auth_cubit/auth_cubit.dart';
+import 'package:task_app/features/users_screen/presentiation/views/hello_user.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -18,11 +19,11 @@ class _ProfileViewState extends State<ProfileView> {
   void initState() {
     super.initState();
 
-    authCubit.get(context).isRefreshTokenValid().then((value) {
-      if (value == false) {
-        Get.to(() => const LoginView());
-      }
-    });
+    // authCubit.get(context).isRefreshTokenValid().then((value) {
+    //   if (value == false) {
+    //     Get.to(() => const LoginView());
+    //   }
+    // });
   }
 
   @override
@@ -38,19 +39,24 @@ class _ProfileViewState extends State<ProfileView> {
         onRefresh: () async {
           await Future.delayed(const Duration(seconds: 1));
 
-          await authCubit.get(context).isRefreshTokenValid().then((value) {
-            if (value == false) {
-              Get.to(() => const LoginView());
-            }
-          });
+          await authCubit.get(context).refreshToken();
           setState(() {});
         },
         child: CustomScrollView(slivers: [
           SliverToBoxAdapter(
             child: BlocConsumer<authCubit, LoginState>(
+              listenWhen: (previous, current) =>
+                  current is LoginSuccess ||
+                  current is RefreshTokenSuccess ||
+                  current is RefreshTokenExpired,
+              buildWhen: (previous, current) =>
+                  current is LoginSuccess || current is RefreshTokenSuccess,
               listener: (context, state) {
                 if (state is RefreshTokenExpired) {
-                  Get.to(() => const LoginView());
+                  print("yalla ${state.isTokenExpired}");
+                  if (state.isTokenExpired == true) {
+                    Get.to(() => const LoginView());
+                  }
                 }
                 if (state is LogoutSuccess) {
                   showToastMessage(
@@ -65,6 +71,13 @@ class _ProfileViewState extends State<ProfileView> {
                         horizontal: 20, vertical: 60),
                     child: Column(
                       children: [
+                        CustomButton(
+                            onTap: () {
+                              Get.to(() => const HelloUser());
+                            },
+                            textColor: Colors.black,
+                            text: 'hello user',
+                            buttonColor: AppColors.primaryColor),
                         const CircleAvatar(
                           radius: 70,
                           backgroundColor: Colors.grey,
@@ -78,33 +91,32 @@ class _ProfileViewState extends State<ProfileView> {
                             TextWidget(
                                 fontSize: 20,
                                 color: AppColors.primaryColor,
-                                title:
-                                    "Name:  ${state.user.firstName} ${state.user.lastName}"),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            TextWidget(
-                                fontSize: 20,
-                                color: AppColors.primaryColor,
-                                title: "Email:  ${state.user.email} "),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            TextWidget(
-                                fontSize: 20,
-                                color: AppColors.primaryColor,
-                                title:
-                                    "Phone Number:  ${state.user.phoneNumber} "),
-                            const SizedBox(
-                              height: 200,
-                            ),
-                            CustomButton(
-                                onTap: () {
-                                  authCubit.get(context).userLogout();
-                                },
-                                textColor: Colors.white,
-                                text: 'Logout',
-                                buttonColor: AppColors.primaryColor),
+                                title: "Name:  ${state.user['first_name']} "),
+                            // const SizedBox(
+                            //   height: 10,
+                            // ),
+                            // TextWidget(
+                            //     fontSize: 20,
+                            //     color: AppColors.primaryColor,
+                            //     title: "Email:  ${state.user.email} "),
+                            // const SizedBox(
+                            //   height: 10,
+                            // ),
+                            // TextWidget(
+                            //     fontSize: 20,
+                            //     color: AppColors.primaryColor,
+                            //     title:
+                            //         "Phone Number:  ${state.user.phoneNumber} "),
+                            // const SizedBox(
+                            //   height: 200,
+                            // ),
+                            // CustomButton(
+                            //     onTap: () {
+                            //       authCubit.get(context).userLogout();
+                            //     },
+                            //     textColor: Colors.white,
+                            //     text: 'Logout',
+                            //     buttonColor: AppColors.primaryColor),
                           ],
                         )
                       ],

@@ -1,9 +1,17 @@
 import 'package:task_app/core/utils/api_services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
+import 'package:task_app/features/login_screen/data/repos/login_repo_impl.dart';
+import 'package:task_app/features/users_screen/data/repos/users_repo_impl.dart';
 
-final getit = GetIt.instance;
+final getIt = GetIt.instance;
 
 void setup() {
-  GetIt.instance.registerLazySingleton<ApiService>(() => ApiService());
+  getIt.registerLazySingleton<ApiService>(() => ApiService(dio: Dio()));
+
+  getIt.registerSingleton<LoginRepoImpl>(
+      LoginRepoImpl(apiService: ApiService(dio: Dio())));
+
+  getIt.registerSingleton<UsersRepoImpl>(
+      UsersRepoImpl(apiService: ApiService(dio: Dio())));
 }

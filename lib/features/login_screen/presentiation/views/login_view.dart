@@ -18,6 +18,7 @@ class LoginView extends StatelessWidget {
       listener: (context, state) {
         if (state is LoginFailure) {
           showToastMessage(message: state.errorMessage, isError: true);
+          print(state.errorMessage);
         }
         if (state is LoginSuccess) {
           showToastMessage(
