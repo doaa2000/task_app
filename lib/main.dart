@@ -1,6 +1,6 @@
+import 'package:task_app/core/utils/api_services.dart';
 import 'package:task_app/core/utils/bloc_observer.dart';
 import 'package:task_app/core/utils/service_locator.dart';
-import 'package:task_app/features/login_screen/data/repos/login_repo_impl.dart';
 
 import 'package:task_app/features/login_screen/presentiation/manager/auth_cubit/auth_cubit.dart';
 import 'package:get/get.dart';
@@ -16,7 +16,6 @@ void main() async {
   Bloc.observer = MyBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
 
-  setup();
   runApp(const MyApp());
 }
 
@@ -29,10 +28,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-            create: (context) => authCubit(getIt.get<LoginRepoImpl>())),
-        BlocProvider(
-            create: (context) => UsersCubit(getIt.get<UsersRepoImpl>())),
+        BlocProvider(create: (context) => authCubit(ApiService())),
+        BlocProvider(create: (context) => UsersCubit(ApiService())),
       ],
       child: const GetMaterialApp(
         title: 'Flutter Demo',

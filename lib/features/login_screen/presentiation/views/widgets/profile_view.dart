@@ -5,7 +5,8 @@ import 'package:task_app/features/login_screen/presentiation/views/login_view.da
 import 'package:get/get.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_app/features/login_screen/presentiation/manager/auth_cubit/auth_cubit.dart';
-import 'package:task_app/features/users_screen/presentiation/views/hello_user.dart';
+import 'package:task_app/features/users_screen/presentiation/manager/cubit/users_cubit.dart';
+import 'package:task_app/features/users_screen/presentiation/views/user_data.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -39,25 +40,15 @@ class _ProfileViewState extends State<ProfileView> {
         onRefresh: () async {
           await Future.delayed(const Duration(seconds: 1));
 
-          await authCubit.get(context).refreshToken();
+          // await UsersCubit.get(context).refreshToken();
           setState(() {});
         },
         child: CustomScrollView(slivers: [
           SliverToBoxAdapter(
             child: BlocConsumer<authCubit, LoginState>(
-              listenWhen: (previous, current) =>
-                  current is LoginSuccess ||
-                  current is RefreshTokenSuccess ||
-                  current is RefreshTokenExpired,
-              buildWhen: (previous, current) =>
-                  current is LoginSuccess || current is RefreshTokenSuccess,
+              listenWhen: (previous, current) => current is LoginSuccess,
+              buildWhen: (previous, current) => current is LoginSuccess,
               listener: (context, state) {
-                if (state is RefreshTokenExpired) {
-                  print("yalla ${state.isTokenExpired}");
-                  if (state.isTokenExpired == true) {
-                    Get.to(() => const LoginView());
-                  }
-                }
                 if (state is LogoutSuccess) {
                   showToastMessage(
                       message: 'You are logged out successfully',
@@ -73,10 +64,10 @@ class _ProfileViewState extends State<ProfileView> {
                       children: [
                         CustomButton(
                             onTap: () {
-                              Get.to(() => const HelloUser());
+                              Get.to(() => const UserData());
                             },
                             textColor: Colors.black,
-                            text: 'hello user',
+                            text: 'user data',
                             buttonColor: AppColors.primaryColor),
                         const CircleAvatar(
                           radius: 70,
@@ -85,13 +76,13 @@ class _ProfileViewState extends State<ProfileView> {
                         const SizedBox(
                           height: 40,
                         ),
-                        Column(
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextWidget(
-                                fontSize: 20,
-                                color: AppColors.primaryColor,
-                                title: "Name:  ${state.user['first_name']} "),
+                            // TextWidget(
+                            //     fontSize: 20,
+                            //     color: AppColors.primaryColor,
+                            //     title: "Name:  ${state.user['first_name']} "),
                             // const SizedBox(
                             //   height: 10,
                             // ),
