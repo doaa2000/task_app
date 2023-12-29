@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:task_app/core/utils/constatnts.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -30,16 +29,10 @@ class ApiService {
         return handler.next(options);
       },
       onError: (error, handler) async {
-        print("my status code ${error.response?.statusCode}");
         if (error.response?.statusCode == 401) {
           final newAccessToken = await refreshToken();
 
-          _dio.options.headers['Authorization'] = 'Bearer ';
-          RequestOptions retryOptions = error.requestOptions.copyWith();
-          if (retryOptions.method.toUpperCase() == 'POST') {
-            String refreshToken = await storage.read(key: 'refreshToken') ?? '';
-            retryOptions.headers['Authorization'] = 'Bearer $refreshToken';
-          }
+          _dio.options.headers['Authorization'] = 'Bearer $newAccessToken';
 
           return handler.resolve(await _dio.fetch(
               error.requestOptions.copyWith(validateStatus: (_) => true)));
@@ -69,6 +62,9 @@ class ApiService {
       endPoint,
       data: data,
     );
+    // options: Options(
+    //   // headers: {...headers, "Authorization": authorization},
+    // ));
 
     Map<String, dynamic> responseData = {
       'payload': response.data,
@@ -86,4 +82,41 @@ class ApiService {
 
     return response.data;
   }
+
+  // Future<Map<String, dynamic>> get(
+  //     {required String endPoint, String? authorization}) async {
+  //   var response = await _dio.get('$baseUrl$endPoint',
+  //       options: Options(headers: headerss));
+
+  //   if (response.statusCode == 401) {
+  //     if (await storage.containsKey(key: 'refreshToken')) {
+  //       print('yall hat new access token ');
+  //       await refreshToken();
+
+  //       String newAccessToken = await storage.read(key: 'accessToken') ?? '';
+  //       _dio.options.headers['Authorization'] = 'Bearer $newAccessToken';
+  //       print("my aces  $newAccessToken");
+  //     } else {
+  //       Get.to(() => const LoginView());
+  //     }
+  //   }
+
+  //   return response.data;
+  // }
+
+  // Future<Map<String, dynamic>> refreshToken() async {
+  //   final refreshToken = await storage.read(key: 'refreshToken');
+
+  //   var response = await post(
+  //       endPoint: EndPoints.refreshToken,
+  //       authorization: "Bearer $refreshToken");
+
+  //   if (response['status_code'] == 200) {
+  //     //   apiService.addToken(response['payload']['data']['accessToken']);
+  //     await storage.write(
+  //         key: "accessToken", value: response['data']['access_token']);
+  //     print('payload ${response['data']['access_token']}');
+  //   }
+  //   return response;
+  // }
 }
